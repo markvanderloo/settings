@@ -79,7 +79,7 @@ MYPKGOPTIONS <- register_options("mypkg",defaults=list(a=1,b=2))
 
 # User function that gets exported:
 
-#' Options for my package
+#' Set of get options for my package
 #' 
 #' @param ... Option names to retrieve option values or \code{[key]=[value]} pairs to set values.
 #'

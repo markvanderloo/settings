@@ -2,4 +2,5 @@
 
 export(clone_and_merge)
 export(register_options)
+export(reserved)
 export(reset)
