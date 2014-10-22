@@ -1,7 +1,7 @@
 #' An option manager for R.
 #'
 #' See \code{\link{register_options}} for examples and usage.
-#'
+#' 
 #' 
 #' @docType package
 #' @name options-package
@@ -16,9 +16,26 @@ OPTIONREGISTER <- new.env()
 #' a function that can be uset to set, get, or reset options; or to return a reference to 
 #' the options register or to clone the options reference alltogether.
 #'
+#' The following terms are arguments of the function that is returned and cannot be used as
+#' option names:
+#' 
+#' \code{.where} \code{.simplify} \code{.reset} \code{.clone} \code{.ref}
+#'
+#'
 #' @param name name of option set
 #' @param defaults list of default options
-#' 
+#'
+#' @return A \code{function} that can be used as a custom options manager. It has the
+#' following arguments.
+#' \tabular{ll}{
+#' \code{...} \tab Comma separated list of option names (\code{character}) to retrieve options or \code{[name]=[value]} pairs to set options.\cr
+#' \code{.where} \tab (\code{environment}; \code{NULL}) Where to set options (optional, default is global) \code{environment} that was obtained using the \code{clone} or \code{ref} option. \cr
+#'  \code{.simplify}\tab (\code{logical}; \code{TRUE}) Attempt to simplify list of retrieved options?\cr
+#'  \code{.reset} \tab (\code{logical}; \code{FALSE}) Reset options to default values\cr
+#'  \code{.clone} \tab (\code{logical}; \code{FALSE}) Create a copy of the options (returns newly created environment)\cr
+#'  \code{.ref} \tab  (\code{logical}; \code{FALSE}) Return a reference to the option environment.
+#' }
+#'   
 #' @examples
 #' # create an options register
 #' my_options <- register_options('myopt',defaults=list(foo=1,bar=2,baz='bob'))
@@ -66,13 +83,11 @@ register_options <- function(name,defaults=list()){
   op <- reg(name,defaults)
   
   get_option <- function(where, opts, simplify){
-    if (length(opts) == 0 ) 
-      where$options 
-    else
-      if (simplify) 
-        sapply(opts, function(x) where$options[[x]]) 
-      else 
-        where$options[unlist(opts)]
+    if (length(opts) == 0 ) opts <- names(where$options)
+    if (simplify) 
+      sapply(opts, function(x) where$options[[x]]) 
+    else 
+      where$options[unlist(opts)]
   }
   
   set_option <- function(where, opts, reset){
