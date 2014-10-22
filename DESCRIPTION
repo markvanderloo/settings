@@ -1,0 +1,16 @@
+Package: options
+Type: Package
+Title: Option Manager for R
+Version: 0.0.1
+Date: 2014-10-22
+Author: Mark van der Loo
+Maintainer: Mark vand er Loo <mark.vanderloo@gmail.com>
+Description: This option manager is similar to futile.options, except that it
+    stores global options in an environment rather than in R's default option
+    list. The advantage of this slight generalisation is that it allows users
+    to easily define option hierarchies where options at the level of a
+    function call overwrite options specified for an object, which overwrite
+    options specified globally.
+License: GPL-3
+Suggests:
+    testthat
