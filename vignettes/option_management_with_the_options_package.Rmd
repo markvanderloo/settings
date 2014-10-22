@@ -1,0 +1,214 @@
+---
+title: "Option management with the options package"
+author: "Mark van der Loo"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+---
+
+Basic use
+------------
+In its most basic form, the `options` package gives you the benefit of defining an options registry
+that can be easily reset to default values. First, define an options registry.
+```{r}
+library(options)
+my_options <- register_options(
+    name = "myopt"
+  , defaults = list(foo = 1, bar = 2, baz = 'hello')
+)
+my_options()
+```
+Individual values can be set and retrieved using the function ```my_options``` that we've just created.
+```{r}
+my_options('foo')
+my_options('foo','baz')
+```
+Option values may also be set as follows.
+```{r}
+my_options(foo=7)
+my_options()
+# or multiple options at once
+my_options(foo=7,bar=0)
+my_options()
+```
+And we reset everything to factory settings.
+```{r}
+reset(my_options)
+my_options()
+```
+
+
+Global versus local options
+---------------------------
+It is nice when behaviour of functions that depends on global options can be overwritten at function call.
+With the ```options``` package you can create local options as follows.
+```{r}
+my_options <- register_options("foobar", defaults = list(a=2,b=3))
+
+f <- function(x,...){
+  # create local copy of options, merged with the global options.
+  local_opts <- clone_and_merge(my_options,...)
+  # local options can be used
+  local_opts('a') + local_opts('b') * x 
+}
+```
+Now compare the following uses.
+```{r}
+# a and b are taken from global option set.
+f(1)         # 2 + 3 * 1
+# specify 'a'
+f(1,a=10)    # 10 + 3 * 1
+#specify 'a' and 'b'
+f(1,a=10,b=100) # 10 + 100 * 1
+
+# global options are unaltered, as expected.
+my_options()
+```
+
+Note: the ```reset``` function may also be used to reset options in ```local_opts``` within the definiton ```f```.
+
+Using the ```options``` package as options manager for your package.
+--------------------------------------------------------
+The easiest way is probably to create a file for example called ```options.R```. Here's an example.
+```{r,eval=FALSE}
+# Variable, global to package's namespace
+MYPKGOPTIONS <- register_options("mypkg",defaults=list(a=1,b=2))
+
+# User function that gets exported:
+
+#' Options for my package
+#' 
+#' @param ... Option names to retrieve option values or \code{[key]=[value]} pairs to set values.
+#'
+#' @section Supported options:
+#' The following options are supported
+#' \itemize{
+#'  \item{\code{a}}{(\code{numeric};1) The value of a }
+#'  \item{\code{b}}{(\code{numeric};2) The value of b }
+#' }
+#'
+#' @export
+pkg_options <- function(...){
+  # protect against the use of reserved words.
+  if ( any(names(list(...))) %in% options::reserved() ){
+    stop(sprintf("Found illegal option name. The names\n %s\nare not allowed."
+          , paste(options::reserved(),collapse=", ")))
+  }
+  MYPKGOPTIONS(...)
+}
+```
+Dont forget to ```import``` the package in your ```DESCRIPTION``` file and package documentation.
+
+
+
+Reference global or local options in a structure.
+------------------------------------------
+This is a bit more complex case and probably only interesting for programmers who build fairly extensive packages 
+that uses one of R's object orientation systems.
+
+Consider a function ```g(x,...)``` that takes an S3 or S4 object ```x``` as argument as well as some optional
+parameters in ```...```. We would like to create the following behaviour.
+
+* When ```x``` is created, it receives a reference to global option settings unless the user provides extra options.
+* If ```g(x)``` is called, the options stored in ```x``` are used.
+* If ```g(x,[option] = [value])``` is called, the options in ```x``` should be locally merged with options in ```x```.
+
+The below example works with S3 classes but should be easy transferable to S4 classes for those familiar with it.
+First we define some global options.
+```{r}
+opts <- register_options('foo_options',defaults=list(a=0,b=1))
+```
+And a constructor for our ```foo``` class. 
+```{r}
+new_foo <- function(number,...){
+  # find out if extra options have been provided
+  extraopts <- length(list(...)) > 0
+  
+  structure(number
+  , opts = if(!extraopts) opts else clone_and_merge(opts,...)
+  , class= 'foo'
+  )
+}
+```
+We also write a getter and setter function that alters the options stored in an objet of class ```foo```.
+```{r}
+set_foo_opts <- function(x,...){
+  attr(x,'opts') <- clone_and_merge(attr(x,'opts'),...)
+  x
+}
+
+get_foo_opts <- function(x,...){
+  attr(x,'opts')(...)
+}
+```
+Finally, we write a function that uses the information in ```foo```-objects.
+```{r}
+fun <- function(x,...){
+  op <- clone_and_merge(attr(x,'opts'),...)
+  a <- op('a')
+  b <- op('b')
+  attributes(x) <- NULL
+  a + b * x
+}
+```
+Now, lets evaluate some calls to ```fun```.
+```{r}
+X <- new_foo(3.14)
+
+# call using 'vanilla', global options.
+fun(X)
+
+# set options, local to Y
+Y <- new_foo(3.14, a=6)
+fun(Y)
+
+# overwrite options defined in Y:
+fun(Y, b=5)
+
+# change Y's options (we need to use set_foo_opts' return value since Y is not a reference object)
+Y <- set_foo_opts(Y,a=4)
+fun(Y)
+
+# finally we can probe the options set in Y (or X)
+get_foo_opts(Y)
+
+get_foo_opts(X,'a')
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
