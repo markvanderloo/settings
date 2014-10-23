@@ -29,11 +29,11 @@ test_that("Cloning options",{
 
 
 context("Utilities")
-test_that("set_options",{
-  expect_true(set_options(foo=1))
-  expect_true(set_options(foo=1,bar=2))
-  expect_false(set_options())
-  expect_false(set_options('x'))
-  expect_error(set_options('x',foo=3))
+test_that("is_setting",{
+  expect_true(is_setting(foo=1))
+  expect_true(is_setting(foo=1,bar=2))
+  expect_false(is_setting())
+  expect_false(is_setting('x'))
+  expect_error(is_setting('x',foo=3))
 })
 

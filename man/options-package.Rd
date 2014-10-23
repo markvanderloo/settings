@@ -2,7 +2,7 @@
 \docType{package}
 \name{options-package}
 \alias{options-package}
-\title{An option manager for R.}
+\title{A leightweight and powerful option manager for R.}
 \description{
 See \code{\link{options_manager}} for examples and usage.
 }

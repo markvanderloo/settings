@@ -143,7 +143,7 @@ clone_and_merge <- function(options,...){
 
 #' Reset options to default values
 #'
-#' @param options An option manager, as returned by \code{\link{options_manager}} or \code{\link{merge_and_copy}}
+#' @param options An option manager, as returned by \code{\link{options_manager}} or \code{\link{clone_and_merge}}
 #' 
 #' @return The list of reset options, invisibly.
 #' 
@@ -153,7 +153,7 @@ reset <- function(options) options(.__reset=TRUE)
 
 #' Request default option values
 #' 
-#' @param options An option manager, as returned by \code{\link{options_manager}} or \code{\link{merge_and_copy}}
+#' @param options An option manager, as returned by \code{\link{options_manager}} or \code{\link{clone_and_merge}}
 #' 
 #' @return A \code{list}.
 #' 
@@ -181,7 +181,7 @@ defaults <- function(options) options(.__defaults=TRUE)
 #' 
 #' @return \code{logical}, indicating if any of the keys was reserved (invisibly).
 #' 
-#' @seealso \code{\link{set_options}}
+#' @seealso \code{\link{is_setting}}
 #' 
 #' @export
 stop_if_reserved <- function(...){
@@ -198,7 +198,7 @@ stop_if_reserved <- function(...){
 #' 
 #' Utility function for programmers using the options package.
 #' 
-#' @param \code{[key]=[value]} pairs of options
+#' @param ... \code{[key]=[value]} pairs of options
 #' @return \code{logical}, \code{TRUE} if \code{...} represents set-options, \code{FALSE} if
 #'  \code{...} represents get-options. An error is thrown if it cannot be determined.
 #' 
@@ -206,7 +206,7 @@ stop_if_reserved <- function(...){
 #' @seealso \code{\link{stop_if_reserved}}
 #' 
 #' @export 
-set_options <- function(...){
+is_setting <- function(...){
   L <- list(...)
   nm <- names(L)
   set <- !is.null(nm) && !any(nm=="")

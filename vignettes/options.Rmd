@@ -1,18 +1,14 @@
----
-title: "Options management with the options package"
-author: "Mark van der Loo"
-date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Options management with the options package}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\usepackage[utf8]{inputenc}
----
+<!--
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Options management with the options package}
+-->
+Options management with the options package
+===========================================
 
-The ```options``` package is aimed to bring easy-to-use, yet powerful options management to R. 
+The ```options``` package is aimed to bring easy-to-use, yet powerful options management to R. In particular,
 
-- For **users** it brings an easy way to reset option values to defaults.
-- For **R-programmers** and package developers it offers the possibility to easily handle multiple levels of local vs global option settings.
+- for **users** it brings an easy way to define option sets, alter their values and reset option values again to defaults;
+- for **R-programmers** and **package developers** it offers the possibility to easily implement multiple levels of local vs global option settings.
 
 Basic use
 ------------
@@ -22,7 +18,7 @@ library(options)
 my_options <- options_manager(foo = 1, bar = 2, baz = 'hello')
 my_options()
 ```
-You may pass an arbitrary number of such ```[key]=[value]``` pairs. If you want to define an option without a default value, just set its value to \code{NULL}.
+You may pass an arbitrary number of such ```[key]=[value]``` pairs. If you want to define an option without a default value, just set its value to ```NULL```.
 
 Individual values can be set and retrieved using the function ```my_options``` that we've just created.
 ```{r}
@@ -46,11 +42,15 @@ my_options()
 
 Global versus local options
 ---------------------------
-It is nice when behaviour of functions that depends on global options can be overwritten at function call.
-With the ```options``` package you can create local options as follows.
+It is nice when the behaviour of a function that depends on global options can be altered at function call.
+With the ```options``` package you can create local options as follows. First, we create a global options
+manager.
 ```{r}
 my_options <- options_manager(a=2,b=3)
-
+```
+The following function uses global settings by default, but a user can overwrite them by passing extra options
+as ```[name]=[value]``` pairs.
+```{r}
 f <- function(x,...){
   # create local copy of options, merged with the global options.
   local_opts <- clone_and_merge(my_options,...)
@@ -152,7 +152,7 @@ setMethod("test_options","ANY",function(where=NULL,...){
 
 # method for getting/setting functions in a slot.
 setMethod("test_options","TestClass", function(where=NULL,...){
-  if (set_options(...)){
+  if (is_setting(...)){
     where@options <- clone_and_merge(where@options,...)
     where
   } else {
@@ -160,7 +160,7 @@ setMethod("test_options","TestClass", function(where=NULL,...){
   }
 })
 ```
-There are two things to note here. First of all we've introduced the utility function ```set_options``` which determines if the arguments in ```...``` are meant to set options (```TRUE```) or to get them (```FALSE```).
+There are two things to note here. First of all we've introduced the utility function ```is_setting``` which determines if the arguments in ```...``` are meant to set options (```TRUE```) or to get them (```FALSE```).
 Secondly, note that for the ```ANY``` method, we need to merge the value of the first argument.
 
 Now let's see how it all works out.
@@ -201,7 +201,7 @@ RefTest <- setRefClass("RefTest"
       .self$value <- 0
     }
     , options = function(...){
-        if(set_options(...)){
+        if(is_setting(...)){
           .self$.options <- clone_and_merge(.self$.options,...)
         } else {
           .self$.options(...)
