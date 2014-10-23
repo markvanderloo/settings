@@ -2,39 +2,38 @@
 context("setting and getting global options")
 
 test_that("Retrieving options",{
-  opt <- register_options("test-1",default=list(foo=1,bar=2))
+  opt <- options_manager(foo=1,bar=2)
   expect_equal(opt(),list(foo=1,bar=2))
   expect_equal(opt('foo'),1)
   expect_equal(opt('foo','bar'),list(foo=1,bar=2))
-  clear_optionregister()
 })
 
 test_that("Setting/resetting options",{
-  opt <- register_options("test-2",default=list(foo=1,bar=2))
+  opt <- options_manager(foo=1,bar=2)
   expect_equal(opt(foo=3),list(foo=3,bar=2))
   expect_equal(opt(),list(foo=3,bar=2))
-  expect_equal(opt(.reset=TRUE), list(foo=1,bar=2))
+  expect_equal(reset(opt), list(foo=1,bar=2))
   expect_equal(opt(),list(foo=1,bar=2))
-  clear_optionregister()
 })
 
 context("Local options")
 
 test_that("Cloning options",{
-  opt <- register_options("test-3",default=list(foo=1,bar=2))
-  op2 <- opt(.clone=TRUE)
+  opt <- options_manager(foo=1,bar=2)
+  op2 <- clone_and_merge(opt,foo=2)
+  expect_equal(op2(),list(foo=2,bar=2))
   expect_equal(opt(),list(foo=1,bar=2))
-  expect_equal(opt(foo=3, .where=op2),list(foo=3,bar=2))
-  expect_equal(opt(), list(foo=1,bar=2))
-  expect_equal(opt(.where=op2), list(foo=3,bar=2))
-  clear_optionregister()
-})
-
-test_that("Referencing options",{
-  opt <- register_options("test-4",default=list(foo=1,bar=2))
-  expect_identical(opt(.ref=TRUE),OPTIONREGISTER[["test-4"]])  
-  clear_optionregister()
+  reset(op2)
+  expect_equal(op2(),opt())
 })
 
 
+context("Utilities")
+test_that("set_options",{
+  expect_true(set_options(foo=1))
+  expect_true(set_options(foo=1,bar=2))
+  expect_false(set_options())
+  expect_false(set_options('x'))
+  expect_error(set_options('x',foo=3))
+})
 

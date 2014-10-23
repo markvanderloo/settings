@@ -7,9 +7,6 @@
 #' @name options-package
 NULL
 
-
-OPTIONREGISTER <- new.env()
-
 #' Register an options set
 #'
 #' The function \code{register_options} sets up a new options register. It returns
@@ -71,54 +68,41 @@ OPTIONREGISTER <- new.env()
 #' 
 #' @seealso \code{\link{reset}}, \code{\link{clone_and_merge}}
 #' @export
-register_options <- function(name,defaults=list()){
-  reg <- function(n,d){
-    if (name %in% ls(OPTIONREGISTER) ) 
-      warning(sprintf("Overwriting pre-existing option register '%s'",name))
-    OPTIONREGISTER[[name]] <- new.env()
-    OPTIONREGISTER[[name]]$options <- defaults
-    OPTIONREGISTER[[name]]$defaults <- defaults
-    OPTIONREGISTER[[name]]
-  }
-  op <- reg(name,defaults)
+options_manager <- function(...){
+  stop_if_reserved(...)
+  .defaults <- list(...)
+  .op <- .defaults
   
-  
-  function(..., .where=NULL, .reset=FALSE, .clone=FALSE, .ref=FALSE){
+  function(..., .__defaults=FALSE, .__reset=FALSE){
     L <- list(...)
-    # global settings if no local setting is pointed to.
-    if ( is.null(.where) ) .where <- op
-    # are we setting or getting?
-    set <- .reset || ( length(L) > 0 && (length(names(L)) == length(L) & !.clone & !.ref) )
-    get <- ( length(L) > 0 && is.null(names(L)) ) ||
-           ( length(L) == 0 && !.clone && !.ref )
-    if (set)    return( invisible(set_option(.where, L, .reset)) )
-    if (get)    return( get_option(.where, L) )
-    if (.clone)  return( as.environment(as.list(.where)) )
-    if (.ref)    return( .where )
-    stop('Illegal command')
+    if (.__defaults) return(.defaults)
+    if (.__reset){
+      .op <<- .defaults
+      return(invisible(.op))
+    }
+    # get all options
+    if (length(L) == 0) return(.op)
+    # set options:
+    vars <- names(L)
+    if ( !is.null(vars) && !any(vars == "") ){
+      if (!all(vars %in% names(.defaults))){
+        v <- paste(vars[!vars %in% names(.defaults)],collapse=", ")
+        warning(sprintf("Adding options not defined in default: %s",v))
+      }
+      .op[vars] <<- L
+      return(invisible(.op))
+    }
+    # get options
+    if (is.null(vars)){
+      vars <- unlist(L)
+      return( if (length(vars)==1) .op[[vars]] else .op[vars] )
+    }      
+    stop("Illegal arguments")
   }
 }
 
-get_option <- function(where, opts){
-  if (length(opts) == 0 ) opts <- names(where$options)
-  if (length(opts) == 1) 
-    where$options[[unlist(opts)]] 
-  else 
-    where$options[unlist(opts)]
-}
-
-set_option <- function(where, opts, reset){
-  if (reset){
-    where$options <- where$defaults
-  } else {
-    where$options[names(opts)] <- opts
-  }
-  where$options
-}
 
 
-
-clear_optionregister <- function() rm(list=ls(OPTIONREGISTER),envir=OPTIONREGISTER)
 
 #' Manipulate option set
 #'
@@ -131,29 +115,59 @@ clear_optionregister <- function() rm(list=ls(OPTIONREGISTER),envir=OPTIONREGIST
 #' @seealso \code{\link{register_options}}
 #' @export 
 clone_and_merge <- function(options,...){
-  op <- options(.clone=TRUE)
-  options(..., .where=op)
-  # This explicit construction prevents nested calls when clone_and_merge is called
-  # repeatedly and iteratively on an option structure. 
-  f <- function(...,.where=NULL,.reset=FALSE,.clone=FALSE,.ref=FALSE){}
-  body(f) <- body(options)
+  df <- options(.__defaults=TRUE)
+  op <- options()
+  f <- do.call(options_manager,df)
+  do.call(f,op)
+  f(...)
   f
 }
 
 #' Reset options to default values
 #' @rdname clone_and_merge
 #' @export 
-reset <- function(options) options(.reset=TRUE)
+reset <- function(options) options(.__reset=TRUE)
 
-#' List of reserved words
+#' Check if an option name is reserved
 #' 
-#' Returns a list of words that may not be used as option name.
+#' Utility function for programmers using the options package.
+#' 
+#' 
+#' @section Details:
+#' This is a utility function that checks if the keys of the key-value pairs
+#' \code{...} contain reserved words. The reserved words are
+#' 
+#' \code{.__defaults}, \code{.__reserved}.
+#' 
+#' If reserved words are encountered in the input an error thrown.
+#' 
+#' @param ... Comma-separated \code{[key]=[value]} pairs
+#' 
+#' @return \code{logical}, indicating if any of the keys was reserved (invisibly).
 #' 
 #' @export
-reserved <- function() c(".where",".clone",".ref",".reset")
+stop_if_reserved <- function(...){
+  res <- c(".__defaults",".__reserved")
+  out <- names(list(...)) %in% res
+  if (any(out)){
+    v <- paste(names(list(...))[out],collapse=", ")
+    stop("Reserved word used as option name: ",v)
+  }
+  invisible(out)
+}
 
-
-
-
+#' Find out if we're setting or getting
+#' 
+#' @param \code{[key]=[value]} pairs of options
+#' @return logical
+#' @export 
+set_options <- function(...){
+  L <- list(...)
+  nm <- names(L)
+  set <- !is.null(nm) && !any(nm=="")
+  get <- length(L)  == 0 | (length(L) > 0 & is.null(nm)) 
+  stopifnot(set | get)
+  set
+}
 
 
