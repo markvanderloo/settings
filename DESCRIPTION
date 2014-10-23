@@ -8,9 +8,10 @@ Maintainer: Mark vand er Loo <mark.vanderloo@gmail.com>
 Description: Easily define option sets, and add/remove or reset options to
     defaults. This option manager is somewhat similar to futile.options, except
     that it allows to clone and merge options making it easy to implement local
-    vs global options (option hierarchy).
+    vs global options, possibly in a multilevel option hierarchy.
 URL: https://github.com/markvanderloo/options
 License: GPL-3
+VignetteBuilder: knitr
 Suggests:
     testthat,
     knitr

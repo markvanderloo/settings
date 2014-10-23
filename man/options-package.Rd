@@ -4,6 +4,6 @@
 \alias{options-package}
 \title{An option manager for R.}
 \description{
-See \code{\link{register_options}} for examples and usage.
+See \code{\link{options_manager}} for examples and usage.
 }
 

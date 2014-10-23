@@ -1,42 +1,40 @@
-#' An option manager for R.
+#' A leightweight and powerful option manager for R.
 #'
-#' See \code{\link{register_options}} for examples and usage.
+#' See \code{\link{options_manager}} for examples and usage.
 #' 
 #' 
 #' @docType package
 #' @name options-package
 NULL
 
-#' Register an options set
+#' Create a new options manager.
 #'
-#' The function \code{register_options} sets up a new options register. It returns
-#' a function that can be uset to set, get, or reset options; or to return a reference to 
-#' the options register or to clone the options reference alltogether.
+#' Set up a set of options with default values and retrieve a manager for it.
 #'
-#' The following terms are arguments of the function that is returned and cannot be used as
-#' option names:
+#'
+#' @section Details:
 #' 
-#' \code{.where} \code{.reset} \code{.clone} \code{.ref}
+#' The function \code{options_manager} creates an option management function. The returned
+#' function can be uset to set, get, or reset options. The only restriction of the package is
+#' that the following words cannot be used as names for options:
+#' 
+#' \code{.__reset} \code{.__defaults}
 #'
+#' For more details and extensive examples see the vignette by copy-pasting this command:
+#' 
+#'    \code{vignette("options", package = "options")}
 #'
-#' @param name name of option set
-#' @param defaults list of default options
+#' @param ... Comma separated \code{[name]=[value]} pairs. These will be the names and default values for your options manager.
 #'
-#' @return A \code{function} that can be used as a custom options manager. It has the
-#' following arguments.
-#' \tabular{ll}{
-#' \code{...} \tab Comma separated list of option names (\code{character}) to retrieve options or \code{[name]=[value]} pairs to set options.\cr
-#' \code{.where} \tab (\code{environment}; \code{NULL}) Where to set options (optional, default is global) \code{environment} that was obtained using the \code{clone} or \code{ref} option. \cr
-#'  \code{.reset} \tab (\code{logical}; \code{FALSE}) Reset options to default values\cr
-#'  \code{.clone} \tab (\code{logical}; \code{FALSE}) Create a copy of the options (returns newly created environment)\cr
-#'  \code{.ref} \tab  (\code{logical}; \code{FALSE}) Return a reference to the option environment.
-#' }
+#' @return A \code{function} that can be used as a custom options manager. It takes as arguments
+#' a comma separated list of option names (\code{character}) to retrieve options or 
+#' \code{[name]=[value]} pairs to set options.
 #'   
 #' @examples
 #' # create an options register
-#' my_options <- register_options('myopt',defaults=list(foo=1,bar=2,baz='bob'))
+#' my_options <- options_manager(foo=1,bar=2,baz='bob')
 #' 
-#' ### Retrieving global options
+#' ### Retrieving options
 #' my_options() # retrieve the full options list.
 #' my_options('baz')
 #' my_options('foo')
@@ -47,26 +45,19 @@ NULL
 #' ### Setting global options
 #' my_options(foo=3,baz='pete')
 #' my_options()
+#' ### Reset options to default.
+#' reset(my_options)
+#' my_options()
 #' 
-#' ### Create a clone of global options and locally change settings
-#' op <- my_options(clone=TRUE)
-#' ## Retrieving local options
-#' my_options(where=op)
-#' my_options('foo','baz',where=op)
 #' 
-#' ## Setting local options
-#' my_options(foo=12,where=op)
-#' my_options('foo',where=op)
-#' # check that global options are unaltered
-#' my_options('foo')
+#' @seealso 
 #' 
-#' ### Create a reference to (global) options
-#' op_ref <- my_options(ref=TRUE)
-#' my_options(foo=0,where=op_ref)
-#' my_options('foo',where=op_ref) #warning: this changes global settings!
-#' my_options('foo')
+#' Reset to default values: \code{\link{reset}}.
 #' 
-#' @seealso \code{\link{reset}}, \code{\link{clone_and_merge}}
+#' Retrieve default values: \code{\link{defaults}}
+#' 
+#' Create a local, possibly altered copy: \code{\link{clone_and_merge}}
+#' 
 #' @export
 options_manager <- function(...){
   stop_if_reserved(...)
@@ -87,7 +78,7 @@ options_manager <- function(...){
     if ( !is.null(vars) && !any(vars == "") ){
       if (!all(vars %in% names(.defaults))){
         v <- paste(vars[!vars %in% names(.defaults)],collapse=", ")
-        warning(sprintf("Adding options not defined in default: %s",v))
+        warning(sprintf("Adding options not defined in manager: %s",v))
       }
       .op[vars] <<- L
       return(invisible(.op))
@@ -104,15 +95,42 @@ options_manager <- function(...){
 
 
 
-#' Manipulate option set
+#' Create a local, altered copy of an options manager
 #'
-#' @param options A function as returned by \code{\link{register_options}}
-#' @param ... Options to be merged. 
+#' Local options management.
 #'
-#' @return A function like \code{options}. However, the \code{.where} argument cannot be specified
-#'   as this function only stores, (re)sets and gets locally options.
-#'   
-#' @seealso \code{\link{register_options}}
+#' @section Details:
+#' This function creates a copy of the options manager \code{options}, with the same defaults.
+#' However, the current settings may be altered by passing extra arguments. It's intended use
+#' is to allow for easy merging of local options with global ones in a function call.
+#' 
+#' Some more examples can be found in the vignette: \code{vignette('options',package='options')}.
+#'
+#' @param options A function as returned by \code{\link{options_manager}} or \code{clone_and_merge}.
+#' @param ... Options to be merged, in the form of \code{[name]=[value]} pairs. 
+#'
+#' @return A option manager like \code{options}, with possibly different settings.
+#'
+#' @seealso \code{\link{options_manager}}, \code{\link{reset}}, \code{\link{defaults}}
+#' 
+#' @examples 
+#' # Create global option manager.
+#' opt <- options_manager(foo=1,bar='a')
+#' 
+#' # create an altered copy
+#' loc_opt <- clone_and_merge(opt, foo=2)
+#' 
+#' # this has no effect on the 'global' version
+#' opt()
+#' # but the local version is different
+#' loc_opt()
+#' 
+#' # we alter the global version and reset the local version
+#' opt(foo=3)
+#' reset(loc_opt)
+#' opt()
+#' loc_opt()
+#' 
 #' @export 
 clone_and_merge <- function(options,...){
   df <- options(.__defaults=TRUE)
@@ -124,14 +142,29 @@ clone_and_merge <- function(options,...){
 }
 
 #' Reset options to default values
-#' @rdname clone_and_merge
+#'
+#' @param options An option manager, as returned by \code{\link{options_manager}} or \code{\link{merge_and_copy}}
+#' 
+#' @return The list of reset options, invisibly.
+#' 
+#' @seealso \code{\link{defaults}}
 #' @export 
 reset <- function(options) options(.__reset=TRUE)
 
-#' Check if an option name is reserved
+#' Request default option values
+#' 
+#' @param options An option manager, as returned by \code{\link{options_manager}} or \code{\link{merge_and_copy}}
+#' 
+#' @return A \code{list}.
+#' 
+#' @seealso \code{\link{reset}}
+#' @export
+defaults <- function(options) options(.__defaults=TRUE)
+
+
+#' Check for reserved option names.
 #' 
 #' Utility function for programmers using the options package.
-#' 
 #' 
 #' @section Details:
 #' This is a utility function that checks if the keys of the key-value pairs
@@ -140,10 +173,15 @@ reset <- function(options) options(.__reset=TRUE)
 #' \code{.__defaults}, \code{.__reserved}.
 #' 
 #' If reserved words are encountered in the input an error thrown.
+#' The package vignette has examples of its use: 
+#' 
+#'    \code{vignette('options',package='options')}
 #' 
 #' @param ... Comma-separated \code{[key]=[value]} pairs
 #' 
 #' @return \code{logical}, indicating if any of the keys was reserved (invisibly).
+#' 
+#' @seealso \code{\link{set_options}}
 #' 
 #' @export
 stop_if_reserved <- function(...){
@@ -158,8 +196,15 @@ stop_if_reserved <- function(...){
 
 #' Find out if we're setting or getting
 #' 
+#' Utility function for programmers using the options package.
+#' 
 #' @param \code{[key]=[value]} pairs of options
-#' @return logical
+#' @return \code{logical}, \code{TRUE} if \code{...} represents set-options, \code{FALSE} if
+#'  \code{...} represents get-options. An error is thrown if it cannot be determined.
+#' 
+#' 
+#' @seealso \code{\link{stop_if_reserved}}
+#' 
 #' @export 
 set_options <- function(...){
   L <- list(...)
