@@ -2,7 +2,7 @@
 #'
 #' See \code{\link{options_manager}} for examples and usage.
 #' 
-#' 
+#'
 #' @docType package
 #' @name options-package
 NULL
@@ -101,8 +101,8 @@ options_manager <- function(...){
 #'
 #' @section Details:
 #' This function creates a copy of the options manager \code{options}, with the same defaults.
-#' However, the current settings may be altered by passing extra arguments. It's intended use
-#' is to allow for easy merging of local options with global ones in a function call.
+#' However, the current settings may be altered by passing extra arguments. Its intended use
+#' is to allow for easy merging of local options with global settings in a function call.
 #' 
 #' Some more examples can be found in the vignette: \code{vignette('options',package='options')}.
 #'

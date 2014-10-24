@@ -5,6 +5,9 @@
 Options management with the options package
 ===========================================
 
+_Mark van der Loo_ ```Sys.Date()```
+
+
 The ```options``` package is aimed to bring easy-to-use, yet powerful options management to R. In particular,
 
 - for **users** it brings an easy way to define option sets, alter their values and reset option values again to defaults;
@@ -234,7 +237,6 @@ opt()
 reftest$reset()
 reftest$options()
 ```
-
 
 
 
