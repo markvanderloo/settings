@@ -5,7 +5,7 @@
 Options management with the options package
 ===========================================
 
-_Mark van der Loo_ ```Sys.Date()```
+_Mark van der Loo,_   ```r Sys.Date()```
 
 
 The ```options``` package is aimed to bring easy-to-use, yet powerful options management to R. In particular,
@@ -122,8 +122,7 @@ pkg_reset() options::reset(MYPKGOPTIONS)
 
 An example S4 class with local options and global default
 --------------------------------------------------------------
-First we define a general options manager that will be invisible to the user.
-This funciton will hold the global settings.
+First we define a general options manager. If this is part of a package, this will in general be invisible to the user.
 ```{r}
 library(options)
 # general options manager, will be invisible to user.
@@ -143,7 +142,7 @@ TestClass <- setClass("TestClass"
 Note that a adding a function to an object is really adding a reference (since each function has its own
 environment, which is a reference object). For every instance of ```TestClass``` where the ```options``` slot is the default, a call to ```@options``` is a call to the global ```opt```.
 
-Now, we define a user-facing functions that can set or get options, eiter globally or specific to an
+Now, we define a user-facing function that can set or get options, eiter globally or specific to an
 instance of ```TestClass```.
 ```{r}
 setGeneric("test_options",function(where=NULL,...) standardGeneric("test_options"))
