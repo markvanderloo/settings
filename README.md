@@ -1,7 +1,7 @@
-options
+settings
 =======
 
-An Options Manager for R.
+An Option Settings Manager for R.
 
 
 * Not on CRAN yet.
