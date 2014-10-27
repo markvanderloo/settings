@@ -30,7 +30,7 @@ test_that("Cloning options",{
 
 context("Utilities")
 test_that("is_setting",{
-  expect_true(is_setting(foo=1))
+  expect_equal(is_setting(foo=1),TRUE)
   expect_true(is_setting(foo=1,bar=2))
   expect_false(is_setting())
   expect_false(is_setting('x'))

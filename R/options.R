@@ -22,7 +22,7 @@ NULL
 #'
 #' For more details and extensive examples see the vignette by copy-pasting this command:
 #' 
-#'    \code{vignette("options", package = "options")}
+#'    \code{vignette("settings", package = "options")}
 #'
 #' @param ... Comma separated \code{[name]=[value]} pairs. These will be the names and default values for your options manager.
 #'
@@ -104,7 +104,7 @@ options_manager <- function(...){
 #' However, the current settings may be altered by passing extra arguments. Its intended use
 #' is to allow for easy merging of local options with global settings in a function call.
 #' 
-#' Some more examples can be found in the vignette: \code{vignette('options',package='options')}.
+#' Some more examples can be found in the vignette: \code{vignette('settings',package='options')}.
 #'
 #' @param options A function as returned by \code{\link{options_manager}} or \code{clone_and_merge}.
 #' @param ... Options to be merged, in the form of \code{[name]=[value]} pairs. 
@@ -164,7 +164,7 @@ defaults <- function(options) options(.__defaults=TRUE)
 
 #' Check for reserved option names.
 #' 
-#' Utility function for programmers using the options package.
+#' Utility function checking for reserved names.
 #' 
 #' @section Details:
 #' This is a utility function that checks if the keys of the key-value pairs
@@ -175,7 +175,7 @@ defaults <- function(options) options(.__defaults=TRUE)
 #' If reserved words are encountered in the input an error thrown.
 #' The package vignette has examples of its use: 
 #' 
-#'    \code{vignette('options',package='options')}
+#'    \code{vignette('settings',package='options')}
 #' 
 #' @param ... Comma-separated \code{[key]=[value]} pairs
 #' 
@@ -196,7 +196,7 @@ stop_if_reserved <- function(...){
 
 #' Find out if we're setting or getting
 #' 
-#' Utility function for programmers using the options package.
+#' Utility function checking if we're setting or getting.
 #' 
 #' @param ... \code{[key]=[value]} pairs of options
 #' @return \code{logical}, \code{TRUE} if \code{...} represents set-options, \code{FALSE} if

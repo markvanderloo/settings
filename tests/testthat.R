@@ -1,3 +1,3 @@
 library(testthat)
-test_check("options")
+test_check("settings")
 
