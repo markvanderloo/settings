@@ -209,6 +209,7 @@ RefTest <- setRefClass("RefTest"
         }
       }
     , reset = function(){
+        # explicitly reference the 'settings' package here to avoid recursion.
         settings::reset(.self$.options) 
     }
     )
