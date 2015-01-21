@@ -80,7 +80,8 @@ Using the ```settings``` package as options manager for your package.
 --------------------------------------------------------
 The easiest way is probably to create a file for example called ```options.R```. Here's an example.
 ```{r,eval=FALSE}
-# Variable, global to package's namespace, not exported to user space.
+# Variable, global to package's namespace. 
+# This function is not exported to user space and does not need to be documented.
 MYPKGOPTIONS <- options_manager(a=1, b=2)
 
 # User function that gets exported:
