@@ -18,6 +18,9 @@ Description: Provides option settings management that goes
 URL: https://github.com/markvanderloo/settings
 License: GPL-3
 VignetteBuilder: knitr
+Imports:
+    grDevices,
+    graphics
 Suggests:
     testthat,
     knitr

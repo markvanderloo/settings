@@ -1,7 +1,15 @@
 # utilities to reset par() and options() to 'factory defaults'
-PARDEFAULTS <- par(no.readonly=TRUE)
-PARDEFAULTS$new <- FALSE
-PARDEFAULTS <- PARDEFAULTS[!names(PARDEFAULTS) %in% c("bg", "fin", "mai", "new", "pin", "plt", "ps")]
+PARDEFAULTS <- list()
+
+.onLoad <- function(libname, pkgename){
+  tmpdev <- tempfile()
+  on.exit(unlink(tmpdev))
+  pdf(file = tmpdev)
+  PARDEFAULTS <<- par(no.readonly=TRUE)
+  PARDEFAULTS$new <<- FALSE
+  PARDEFAULTS <<- PARDEFAULTS[!names(PARDEFAULTS) %in% c("bg", "fin", "mai", "new", "pin", "plt", "ps")]
+}
+
 
 
 # set defaults at build time.
