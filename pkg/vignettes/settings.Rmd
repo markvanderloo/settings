@@ -10,14 +10,35 @@ _Mark van der Loo,_   ```r Sys.Date()```
 
 The ```settings``` package is aimed to bring easy-to-use, yet powerful options management to R. In particular,
 
+- for **users** it allows for an easy way to reset ```par``` and ```options``` to their `factory defaults'.
 - for **users** it brings an easy way to define option sets, alter their values and reset option values again to defaults;
 - for **R-programmers** and **package developers** it offers the possibility to easily implement multiple levels of local vs global option settings.
 
-Basic use
+
+Resetting ```par``` and ```options```
+-----------------------------
+
+Here's an example of resetting graphical parameters.
+```{r}
+library(settings)
+par('lwd')
+par(lwd=4)
+par('lwd')
+reset_par()
+par('lwd')
+```
+A call to ```reset_par()``` resets sends every graphical option back to its initial value.
+Use
+```{r}
+reset_options()
+```
+to send all of base R's default options back to their beginnings.
+
+
+Basic option settings management
 ------------
 To start storing options we first define an options manager by feeding it default option names and values.
 ```{r}
-library(settings)
 my_options <- options_manager(foo = 1, bar = 2, baz = 'hello')
 my_options()
 ```

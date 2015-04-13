@@ -1,11 +1,3 @@
-#' A leightweight and powerful option manager for R.
-#'
-#' See \code{\link{options_manager}} for examples and usage.
-#' 
-#'
-#' @docType package
-#' @name options-package
-NULL
 
 #' Create a new options manager.
 #'
@@ -22,7 +14,7 @@ NULL
 #'
 #' For more details and extensive examples see the vignette by copy-pasting this command:
 #' 
-#'    \code{vignette("settings", package = "options")}
+#'    \code{vignette("settings", package = "settings")}
 #'
 #' @param ... Comma separated \code{[name]=[value]} pairs. These will be the names and default values for your options manager.
 #'

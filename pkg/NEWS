@@ -1,0 +1,5 @@
+Version 0.2.0
+- Added reset_par(), reset_options() 
+
+Version 0.1.1
+- Initial CRAN release

@@ -27,7 +27,7 @@ that the following words cannot be used as names for options:
 
 For more details and extensive examples see the vignette by copy-pasting this command:
 
-   \code{vignette("settings", package = "options")}
+   \code{vignette("settings", package = "settings")}
 }
 \examples{
 # create an options register
