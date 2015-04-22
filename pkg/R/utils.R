@@ -6,6 +6,7 @@ PARDEFAULTS <- list()
   on.exit(unlink(tmpdev))
   pdf(file = tmpdev)
   PARDEFAULTS <<- par(no.readonly=TRUE)
+  dev.off()
   PARDEFAULTS$new <<- FALSE
   PARDEFAULTS <<- PARDEFAULTS[!names(PARDEFAULTS) %in% c("bg", "fin", "mai", "new", "pin", "plt", "ps")]
 }

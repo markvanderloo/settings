@@ -1,0 +1,8 @@
+version 0.2.2
+- bugfix: graphs device altered after loading package.
+
+version 0.2.1
+- added reset_par(), reset_options()
+
+version 0.1.0
+- initial CRAN release
