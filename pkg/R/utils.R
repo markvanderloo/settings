@@ -1,7 +1,7 @@
 # utilities to reset par() and options() to 'factory defaults'
 PARDEFAULTS <- list()
 
-.onLoad <- function(libname, pkgename){
+.onLoad <- function(libname, pkgname){
   tmpdev <- tempfile()
   on.exit(unlink(tmpdev))
   pdf(file = tmpdev)
@@ -41,7 +41,7 @@ reset_par <- function(){
   par(PARDEFAULTS)
 }
 
-#' Reset general options in 'par' to factory defaults.
+#' Reset general options in 'options' to factory defaults.
 #' 
 #' @seealso \code{\link{reset_par}}
 #' @export 
