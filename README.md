@@ -1,5 +1,4 @@
-[![CRAN](http://www.r-pkg.org/badges/version/settings)](http://cran.r-project.org/web/packages/settings/NEWS)
-[![Downloads](http://cranlogs.r-pkg.org/badges/settings)](http://cran.r-project.org/package=settings/) 
+[![Build Status](https://travis-ci.org/markvanderloo/settings.svg)](https://travis-ci.org/markvanderloo/settings)[![CRAN](http://www.r-pkg.org/badges/version/settings)](http://cran.r-project.org/web/packages/settings/NEWS)[![Downloads](http://cranlogs.r-pkg.org/badges/settings)](http://cran.r-project.org/package=settings/) 
 
 settings
 =======
