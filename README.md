@@ -1,3 +1,6 @@
+[![CRAN](http://www.r-pkg.org/badges/version/settings)](http://cran.r-project.org/web/packages/settings/NEWS)
+[![Downloads](http://cranlogs.r-pkg.org/badges/settings)](http://cran.r-project.org/package=settings/) 
+
 settings
 =======
 
