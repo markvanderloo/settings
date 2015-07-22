@@ -1,5 +1,4 @@
-[![CRAN](http://www.r-pkg.org/badges/version/settings)](http://cran.r-project.org/web/packages/settings/NEWS)
-[![Downloads](http://cranlogs.r-pkg.org/badges/settings)](http://cran.r-project.org/package=settings/) 
+[![Build Status](https://travis-ci.org/markvanderloo/settings.svg)](https://travis-ci.org/markvanderloo/settings) [![Coverage Status](https://coveralls.io/repos/markvanderloo/settings/badge.svg?branch=master&service=github)](https://coveralls.io/github/markvanderloo/settings?branch=master) [![CRAN](http://www.r-pkg.org/badges/version/settings)](http://cran.r-project.org/web/packages/settings/NEWS) [![Downloads](http://cranlogs.r-pkg.org/badges/settings)](http://cran.r-project.org/package=settings/) 
 
 settings
 =======
