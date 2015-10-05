@@ -16,7 +16,12 @@
 #' 
 #'    \code{vignette("settings", package = "settings")}
 #'
+#' @section Checking options:
+#' blabla
+#'
+#'
 #' @param ... Comma separated \code{[name]=[value]} pairs. These will be the names and default values for your options manager.
+#' @param .allowed list of named functions that check an option (see 'checking options') 
 #'
 #' @return A \code{function} that can be used as a custom options manager. It takes as arguments
 #' a comma separated list of option names (\code{character}) to retrieve options or 
@@ -51,11 +56,16 @@
 #' Create a local, possibly altered copy: \code{\link{clone_and_merge}}
 #' 
 #' @export
-options_manager <- function(...){
+options_manager <- function(..., .allowed){
   stop_if_reserved(...)
   .defaults <- list(...)
   .op <- .defaults
-  
+
+  .al <- list()
+  for ( v in names(.defaults)) .al[[v]] <- nolimit
+  if (!missing(.allowed)) .al[names(.allowed)] <- .allowed
+
+
   function(..., .__defaults=FALSE, .__reset=FALSE){
     L <- list(...)
     if (.__defaults) return(.defaults)
@@ -72,6 +82,8 @@ options_manager <- function(...){
         v <- paste(vars[!vars %in% names(.defaults)],collapse=", ")
         warning(sprintf("Adding options not defined in manager: %s",v))
       }
+      # check if values are allowed.
+      for ( v in vars ) .al[[v]](L[[v]])
       .op[vars] <<- L
       return(invisible(.op))
     }
@@ -83,6 +95,34 @@ options_manager <- function(...){
     stop("Illegal arguments")
   }
 }
+
+
+#' Option checkers
+#'
+#' @param ... comma-separated list of allowed values (all \code{character})
+#' @param min minimum value (for numeric options)
+#' @param max maximum value (for numeric options)
+#' @export
+inlist <- function(...){
+  .list <- list(...)
+  function(x){
+    if (!x %in% .list){
+      stop("Value out of range. Allowed values are %s",paste(.list,collapse=","))
+    }
+  }
+}
+
+#' @rdname inlist
+inrange <- function(min=-Inf,max=Inf){
+  .range <- c(min=min, max=max)
+  function(x){
+    if( !is.numeric(x) || ( x > .range['max'] | x < .range['min']) ){
+      stop(sprintf("Value out of range. Allowed values are in [%g, %g]",.range['min'], .range['max']))
+    }
+  }
+}
+
+nolimit <- function(...) invisible(NULL) 
 
 
 
