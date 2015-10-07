@@ -110,10 +110,10 @@ options_manager <- function(..., .allowed){
 #' @param max maximum value (for numeric options)
 #' @export
 inlist <- function(...){
-  .list <- list(...)
+  .list <- unlist(list(...))
   function(x){
     if (!x %in% .list){
-      stop("Value out of range. Allowed values are %s",paste(.list,collapse=","))
+      stop(sprintf("Value out of range. Allowed values are %s",paste(.list,collapse=",")))
     }
   }
 }
