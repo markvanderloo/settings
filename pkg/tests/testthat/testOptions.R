@@ -37,3 +37,19 @@ test_that("is_setting",{
   expect_error(is_setting('x',foo=3))
 })
 
+contex("Range checks",{
+  expect_error( options_manager(foo=1,.allowed=c(x=inrange(0,1)))  )
+  expect_error(options_manager(x=1,.allowed=list(x=inrange(2,3))))
+  opt <- options_manager(foo=1,bar=0
+    , .allowed=list(
+        foo = inrange(min=0,max=1)
+        ,bar = inlist(c(0,1,2))
+    )
+  )
+  expect_error(opt(foo=2))
+  
+})
+
+
+
+

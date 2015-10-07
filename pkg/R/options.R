@@ -17,7 +17,7 @@
 #'    \code{vignette("settings", package = "settings")}
 #'
 #' @section Checking options:
-#' blabla
+#' 
 #'
 #'
 #' @param ... Comma separated \code{[name]=[value]} pairs. These will be the names and default values for your options manager.
@@ -64,7 +64,13 @@ options_manager <- function(..., .allowed){
   .al <- list()
   for ( v in names(.defaults)) .al[[v]] <- nolimit
   if (!missing(.allowed)) .al[names(.allowed)] <- .allowed
-
+  if (!all(names(.al) %in% names(.op))  ){
+    nm <- names(.al)[!names(.al) %in% names(.op)]
+    stop(sprintf("Trying to set limits for undefined options %s\n",paste(nm,collapse=", ")))
+  }
+  vars <- names(.op)
+  for (v in vars) .al[[v]](.defaults[[v]])
+  
 
   function(..., .__defaults=FALSE, .__reset=FALSE){
     L <- list(...)
