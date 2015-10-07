@@ -17,7 +17,11 @@
 #'    \code{vignette("settings", package = "settings")}
 #'
 #' @section Checking options:
-#' 
+#' Option values can be checked automatically by supplying the options manager
+#' with a named list of functions (\code{.allowed}) that take an option value
+#' and throw an error if it is out-of-range. The functions \code{\link{inlist}}
+#' and \code{\link{inrange}} are convenience functions that create such checking
+#' functions for you.
 #'
 #'
 #' @param ... Comma separated \code{[name]=[value]} pairs. These will be the names and default values for your options manager.
@@ -105,9 +109,13 @@ options_manager <- function(..., .allowed){
 
 #' Option checkers
 #'
-#' @param ... comma-separated list of allowed values (all \code{character})
+#' These functions return a function that is used by the options manager internally
+#' to check whether an option set by the user is allowed.
+#'
+#' @param ... comma-separated list of allowed values.
 #' @param min minimum value (for numeric options)
 #' @param max maximum value (for numeric options)
+#' @seealso \code{\link{options_manager}} for examples.
 #' @export
 inlist <- function(...){
   .list <- unlist(list(...))
@@ -119,6 +127,7 @@ inlist <- function(...){
 }
 
 #' @rdname inlist
+#' @export
 inrange <- function(min=-Inf,max=Inf){
   .range <- c(min=min, max=max)
   function(x){
@@ -168,6 +177,22 @@ nolimit <- function(...) invisible(NULL)
 #' reset(loc_opt)
 #' opt()
 #' loc_opt()
+#' 
+#' # create an options manager with some option values limited
+#' opt <- options_manager(prob=0.5,y='foo',z=1,
+#'   .allowed=list(
+#'      prob = inrange(min=0,max=1)
+#'      , y    = inlist("foo","bar")
+#'    )
+#'  )
+#' # change an option
+#' opt(prob=0.8)
+#' opt("prob")
+#' \dontrun{
+#' # this gives an error
+#' opt(prob=2)
+#' }
+#' 
 #' 
 #' @export 
 clone_and_merge <- function(options,...){
