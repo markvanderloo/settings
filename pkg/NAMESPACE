@@ -2,6 +2,8 @@
 
 export(clone_and_merge)
 export(defaults)
+export(inlist)
+export(inrange)
 export(is_setting)
 export(options_manager)
 export(reset)
