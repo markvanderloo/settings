@@ -50,7 +50,9 @@
 #' reset(my_options)
 #' my_options()
 #' 
-#' 
+#' ### Limit the possible values for an option.
+#' my_options <- options_manager( fu="bar",.allowed = list(fu=inlist("foo","bar")) )
+#'
 #' @seealso 
 #' 
 #' Reset to default values: \code{\link{reset}}.
