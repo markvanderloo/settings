@@ -17,6 +17,7 @@ Description: Provides option settings management that goes
     and reference classes. There are convenience functions to reset par() 
     and options() to their 'factory defaults'.
 URL: https://github.com/markvanderloo/settings
+BugReports: https://github.com/markvanderloo/settings/issues
 License: GPL-3
 VignetteBuilder: knitr
 Imports:
