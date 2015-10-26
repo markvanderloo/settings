@@ -123,7 +123,7 @@ inlist <- function(...){
   .list <- unlist(list(...))
   function(x){
     if (!x %in% .list){
-      stop(sprintf("Value out of range. Allowed values are %s",paste(.list,collapse=",")))
+      stop(sprintf("Option value out of range. Allowed values are %s",paste(.list,collapse=",")),call.=FALSE)
     }
   }
 }
@@ -134,7 +134,8 @@ inrange <- function(min=-Inf,max=Inf){
   .range <- c(min=min, max=max)
   function(x){
     if( !is.numeric(x) || ( x > .range['max'] | x < .range['min']) ){
-      stop(sprintf("Value out of range. Allowed values are in [%g, %g]",.range['min'], .range['max']))
+      stop(sprintf("Option value out of range. Allowed values are in [%g, %g]",.range['min'], .range['max'])
+           ,call.=FALSE)
     }
   }
 }

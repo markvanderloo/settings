@@ -63,6 +63,37 @@ reset(my_options)
 my_options()
 ```
 
+Limiting options
+---------------------------
+It is possible to limit the option values a user can set so you don't have to check them at
+run time.
+```{r}
+opt <- options_manager(foo="up", bar=2
+  , .allowed = list(
+      foo = inlist("up","down")
+    , bar = inrange(min=0, max=3)
+  )
+)
+```
+In the above code, we set the following options:
+
+- `foo` with default value `"up"` and allowed values `"up"` and `"down"`
+- `bar` with default value 2 and ```0 <= bar <= 3```.
+
+If you try to set an invalid option, an error is produced.
+```{r, eval=FALSE}
+> opt(foo="middle")
+Error: Option value out of range. Allowed values are up, down
+> opt(bar=7)
+Error: Option value out of range. Allowed values are in [0, 3]
+```
+
+You don't need to set allowed values or ranges for each and every option. Only those options that have an entry in the `.allowed` list will be checked.
+
+
+
+
+
 
 Global versus local options
 ---------------------------

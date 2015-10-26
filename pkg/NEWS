@@ -1,5 +1,5 @@
 version 0.2.3
-- support for defining allowed option values
+- support for limiting option values
 
 version 0.2.2
 - bugfix: graphs device altered after loading package.
