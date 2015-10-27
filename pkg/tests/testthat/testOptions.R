@@ -14,6 +14,7 @@ test_that("Setting/resetting options",{
   expect_equal(opt(),list(foo=3,bar=2))
   expect_equal(reset(opt), list(foo=1,bar=2))
   expect_equal(opt(),list(foo=1,bar=2))
+  expect_warning(opt(fu=1))
 })
 
 context("Local options")

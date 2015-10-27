@@ -68,16 +68,20 @@ options_manager <- function(..., .allowed){
   .op <- .defaults
 
   .al <- list()
+  # default option checkers
   for ( v in names(.defaults)) .al[[v]] <- nolimit
+  # set explicitly mentioned option checkers
   if (!missing(.allowed)) .al[names(.allowed)] <- .allowed
+  # if you impose a limit on an option thats not defined: stop.
   if (!all(names(.al) %in% names(.op))  ){
     nm <- names(.al)[!names(.al) %in% names(.op)]
     stop(sprintf("Trying to set limits for undefined options %s\n",paste(nm,collapse=", ")))
   }
+  # Check the default values against allowed ranges.
   vars <- names(.op)
   for (v in vars) .al[[v]](.defaults[[v]])
   
-
+  # create the options manager function
   function(..., .__defaults=FALSE, .__reset=FALSE){
     L <- list(...)
     if (.__defaults) return(.defaults)
@@ -91,11 +95,16 @@ options_manager <- function(..., .allowed){
     vars <- names(L)
     if ( !is.null(vars) && !any(vars == "") ){
       if (!all(vars %in% names(.defaults))){
-        v <- paste(vars[!vars %in% names(.defaults)],collapse=", ")
-        warning(sprintf("Adding options not defined in manager: %s",v))
+        ii <- vars %in% names(.defaults)
+        warning(sprintf("Ignoring options not defined in manager: %s"
+            , paste(vars[!ii], collapse=", ") 
+        ))
+        vars <- vars[ii]
+        L <- L[ii]
       }
-      # check if values are allowed.
-      for ( v in vars ) .al[[v]](L[[v]])
+      # check if values are allowed (only for occurring options).
+      ii <- vars %in% names(.defaults)
+      for ( v in vars[ii] ) .al[[v]](L[[v]])
       .op[vars] <<- L
       return(invisible(.op))
     }
