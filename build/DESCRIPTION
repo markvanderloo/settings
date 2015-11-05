@@ -1,7 +1,7 @@
 Package: settings
 Type: Package
 Title: Software Option Settings Manager for R
-Version: 0.2.4
+Version: 0.2.5
 Date: 2015-10-27
 Author: Mark van der Loo
 Maintainer: Mark van der Loo <mark.vanderloo@gmail.com>

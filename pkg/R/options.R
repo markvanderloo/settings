@@ -25,6 +25,8 @@
 #'
 #'
 #' @param ... Comma separated \code{[name]=[value]} pairs. These will be the names and default values for your options manager.
+#' @param .list optional List of \code{[name]=[value]} pairs. Will be concatenated with 
+#'   arguments in \code{...}.
 #' @param .allowed list of named functions that check an option (see 'checking options') 
 #'
 #' @return A \code{function} that can be used as a custom options manager. It takes as arguments
@@ -62,9 +64,14 @@
 #' Create a local, possibly altered copy: \code{\link{clone_and_merge}}
 #' 
 #' @export
-options_manager <- function(..., .allowed){
+options_manager <- function(..., .list, .allowed){
   stop_if_reserved(...)
-  .defaults <- list(...)
+  if (missing(.list)){ 
+    .list <- NULL
+  } else { 
+   stopifnot(is.list(.list))
+  }
+  .defaults <- c(list(...),.list)
   .op <- .defaults
 
   .al <- list()

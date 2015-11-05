@@ -17,6 +17,25 @@ test_that("Setting/resetting options",{
   expect_warning(opt(fu=1))
 })
 
+test_that("Setting/resetting options with .list argument",{
+  opt <- options_manager(.list=list(foo=1,bar=2))
+  expect_equal(opt(foo=3),list(foo=3,bar=2))
+  expect_equal(opt(),list(foo=3,bar=2))
+  expect_equal(reset(opt), list(foo=1,bar=2))
+  expect_equal(opt(),list(foo=1,bar=2))
+  expect_warning(opt(fu=1))
+})
+
+test_that("Setting/resetting options with mixed .list argument",{
+  opt <- options_manager(foo=1, .list=list(bar=2))
+  expect_equal(opt(foo=3),list(foo=3,bar=2))
+  expect_equal(opt(),list(foo=3,bar=2))
+  expect_equal(reset(opt), list(foo=1,bar=2))
+  expect_equal(opt(),list(foo=1,bar=2))
+  expect_warning(opt(fu=1))
+})
+
+
 context("Local options")
 
 test_that("Cloning options",{
