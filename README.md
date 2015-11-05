@@ -13,3 +13,13 @@ From R:
 ```
 install.packages('settings')
 ```
+
+The latest beta is available from my `drat` repo (if you're computer is
+infected with Windows, you need to install
+[rtools](https://cran.r-project.org/bin/windows/Rtools/) first).
+```
+drat::addRepo("markvanderloo")
+install.packages("settings", type="source")
+```
+
+
