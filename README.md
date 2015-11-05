@@ -14,7 +14,7 @@ From R:
 install.packages('settings')
 ```
 
-The latest beta is available from my `drat` repo (if you're computer is
+The latest beta is available from my `drat` repo (if your computer is
 infected with Windows, you need to install
 [rtools](https://cran.r-project.org/bin/windows/Rtools/) first).
 ```
