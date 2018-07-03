@@ -73,6 +73,25 @@ test_that("range checks",{
   
 })
 
+context("Custom checks")
 
+test_that("custom checks can normalize options",{
+  # Function that creates a category checker that is case-independent.
+  my_checker <- function(x){
+    if (!(tolower(x) %in% c("hey","ho","letsgo!")) ){
+      stop("red alert!",call.=FALSE)
+    } else {
+      tolower(x)
+    }
+  }
+  opts <- options_manager(foo="HEY", .allowed=list(foo=my_checker))
+  
+  expect_equal(opts(foo="HEY")$foo,"hey")
+    
+})
 
-
+#devtools::load_all('pkg')
+#opt <- options_manager(foo="hey", .allowed=list(foo=my_check("Hey","Yo")))
+#opt()
+#opt(foo="HEY")
+#opt()
