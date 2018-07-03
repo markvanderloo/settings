@@ -90,8 +90,3 @@ test_that("custom checks can normalize options",{
     
 })
 
-#devtools::load_all('pkg')
-#opt <- options_manager(foo="hey", .allowed=list(foo=my_check("Hey","Yo")))
-#opt()
-#opt(foo="HEY")
-#opt()
