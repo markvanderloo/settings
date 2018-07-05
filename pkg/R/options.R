@@ -111,9 +111,8 @@ options_manager <- function(..., .list, .allowed){
       }
       # check if values are allowed (only for occurring options).
       ii <- vars %in% names(.defaults)
-      for ( v in vars[ii] ){ 
-        L[[v]] <- .al[[v]](L[[v]])
-      }
+      for ( v in vars[ii] ) L[[v]] <- .al[[v]](L[[v]])
+      
       .op[vars] <<- L
       return(invisible(.op))
     }

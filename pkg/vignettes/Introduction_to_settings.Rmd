@@ -1,42 +1,50 @@
-<!--
-%\VignetteEngine{knitr::knitr}
-%\VignetteIndexEntry{Option settings management with the settings package}
--->
-Option settings management with the settings package
-===========================================
+---
+title: "Introduction to settings"
+author: "Mark van der Loo"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Introduction to settings}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
-_Mark van der Loo,_   ```r Sys.Date()```
-
-
-The ```settings``` package is aimed to bring easy-to-use, yet powerful options management to R. In particular,
-
-- for **users** it allows for an easy way to reset ```par``` and ```options``` to their `factory defaults'.
-- for **users** it brings an easy way to define option sets, alter their values and reset option values again to defaults;
-- for **R-programmers** and **package developers** it offers the possibility to easily implement multiple levels of local vs global option settings.
-
-
-Resetting ```par``` and ```options```
------------------------------
-
-Here's an example of resetting graphical parameters.
-```{r}
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
 library(settings)
-par('lwd')
-par(lwd=4)
-par('lwd')
-reset_par()
-par('lwd')
 ```
-A call to ```reset_par()``` resets sends every graphical option back to its initial value.
-Use
-```{r}
-reset_options()
-```
-to send all of base R's default options back to their beginnings.
 
 
-Basic option settings management
-------------
+### What are options?
+
+Software options are usually simple strings or numbers that alter the behaviour
+of a programme, package or functions. Many options in R can be set with the
+standard `options` functions. However, sometimes it is convenient to have richer
+option management facilities.
+
+### What does the settings package do?
+
+The ```settings``` package is aimed to bring easy-to-use, yet powerful options
+management to R. It is light-weight, consists of only a few-hundred lines of code
+and does not import anything that does not come with a standard R installation.
+
+- Define and manage option sets for your package or application with ease
+- Create option managers that can validate user-defined options in a flexible way.
+- Implement multiple levels of local and global options if so desired
+- As a package author, you have the option to export a `reset` function, allowing your
+    users to reset options to their defaults.
+    
+
+
+
+
+### Basic option settings management
+
 To start storing options we first define an options manager by feeding it default option names and values.
 ```{r}
 my_options <- options_manager(foo = 1, bar = 2, baz = 'hello')
@@ -63,8 +71,8 @@ reset(my_options)
 my_options()
 ```
 
-Limiting options
----------------------------
+### Limiting options
+
 It is possible to limit the option values a user can set so you don't have to check them at
 run time.
 ```{r}
@@ -90,13 +98,12 @@ Error: Option value out of range. Allowed values are in [0, 3]
 
 You don't need to set allowed values or ranges for each and every option. Only those options that have an entry in the `.allowed` list will be checked.
 
+It is possible to customize the way options are checked or manipulated. This is
+explained in more detail in a [second vignette](Validating_and_manipulating_option_values.html).
 
 
+### Global versus local options
 
-
-
-Global versus local options
----------------------------
 It is nice when the behaviour of a function that depends on global options can be altered at function call.
 With the ```settings``` package you can create local options as follows. First, we create a global options
 manager.
@@ -128,8 +135,8 @@ my_options()
 
 **Note:** the ```reset``` function may also be used to reset options in ```local_opts``` within the definiton of ```f```. This will not affect the global options.
 
-Using the ```settings``` package as options manager for your package.
---------------------------------------------------------
+### Using the ```settings``` package as options manager for your package.
+
 The easiest way is probably to create a file for example called ```options.R```. Here's an example.
 ```{r,eval=FALSE}
 # Variable, global to package's namespace. 
@@ -173,8 +180,8 @@ be done for example by
 pkg_reset() reset(MYPKGOPTIONS)
 ```
 
-An example S4 class with local options and global default
---------------------------------------------------------------
+### An example S4 class with local options and global default
+
 First we define a general options manager. If this is part of a package, this will in general be invisible to the user.
 ```{r}
 # general options manager, will be invisible to user.
@@ -289,6 +296,7 @@ opt()
 reftest$reset()
 reftest$options()
 ```
+
 
 
 

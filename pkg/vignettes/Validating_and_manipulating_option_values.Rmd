@@ -1,0 +1,144 @@
+---
+title: "Validating and manipulating options"
+author: "Mark van der Loo"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Validating and manipulating options}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(settings)
+```
+
+With `settings` it is possible to create an options manager that extensively checks or
+manipulates the option values passed by a user. There are two use cases for this. First
+it allows you to create a useful error or warning when a user passes an option value
+that is incorrect. Second, it allows you to preprocess the option values before storing
+them. For example by casting a string to lower case.
+
+### Example 1: hard-coded checks
+
+Suppose we want an option called `foo`, that can take three values: `boo`, `bar` and `baz`. We want
+to create an options manager that first casts the user value to lower case. Next, if the 
+value is valid, the lower-case variant will be stored, otherwise an informative error is thrown.
+
+To do this, first write a function that performs these checks. Make sure that the function
+returns the value that needs to be stored.
+```{r}
+foo_check <- function(x){
+  allowed <- c("boo","bar","baz")
+  # cast to lowercase
+  x <- base::tolower(x)
+  if ( !x %in% allowed ){
+    stop("Option foo must be in 'boo', 'bar', or 'baz'", call. = FALSE)
+  } else {
+    x
+  }
+}
+```
+Next, define the options manager as follows.
+```{r}
+my_options <- options_manager(foo="boo", .allowed = list( foo = foo_check) )
+my_options("foo")
+```
+It is important that the names in the `.allowed` list agree with the names of the options.
+
+Let's see what happens when we set the option with capitals:
+```{r, error=TRUE}
+my_options(foo = "BaZ")
+my_options("foo")
+```
+Observe that the stored option is in lowercase whereas the user-defined value includes upper-case letters.
+
+```{r,error=TRUE}
+my_options(foo=1)
+```
+
+### Check function API
+
+The function that you write for checking and/or manipulating option values has to satisfy certain rules to make it work. It is _obligated_ for the function to
+
+1. take a single argument as input. This will be the option value, passed by the user.
+2. return a valid option value.
+
+It is _advised_ to make the cheking function throw an error (stop) when a user passes an invalid value.
+
+
+
+### Example 2: general checkers
+
+In the above example, we have created a function where we hard-wired the possible values in the function code. Suppose you have two variables where you want to perform the same check, but with different values. In this example we show how to add this flexibility. 
+
+We use the fact that in R, a function is a variable, just like any other R object. In particular
+this means that in R, a function can return other functions as output. We will use this to make
+a function called `make_checker` that creates a customized checker function for us. The input of this
+function are the allowed values.
+
+
+```{r}
+make_checker <- function(allowed){
+  .allowed <- allowed
+  function(x){
+    x <- tolower(x)
+    if (!x %in% .allowed){
+      stop(sprintf("Allowed values are %s",paste0(.allowed, collapse=", ")), call.=FALSE)
+    } else {
+      x
+    }
+  }
+}
+```
+
+We now create an options manager with two options: `foo`, with valid values `hey` and `ho` and
+`bar`, with valid values `fee`, `fi`, `fo`, `fum`. 
+```{r}
+my_new_options <- options_manager(foo = "hey", bar="fee"
+  , .allowed = list(
+      foo = make_checker( c("hey", "ho") )
+    , bar = make_checker( c("fee", "fi", "fo", "fum") )
+  ))
+```
+Let's try it out:
+
+```{r,error=TRUE}
+my_new_options(bar="FEE")
+my_new_options("bar")
+
+my_new_options(foo="do")
+```
+
+
+
+### Exercises
+
+Here are some exercises to aquint yourself with this functionality.
+
+1. Create an options manager with the option `boo`, with default value 1, where
+the allowed values are integer powers of two $(1, 2, 4,\ldots)$. If the user
+supplies a value that is not a power of two, an error is thrown.
+2. Generalize the checker of excercise 1 to powers of $n$.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

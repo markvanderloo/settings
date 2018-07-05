@@ -24,5 +24,6 @@ Imports:
     graphics
 Suggests:
     testthat,
-    knitr
+    knitr,
+    rmarkdown
 RoxygenNote: 6.0.1
