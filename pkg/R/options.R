@@ -112,8 +112,7 @@ options_manager <- function(..., .list, .allowed){
       # check if values are allowed (only for occurring options).
       ii <- vars %in% names(.defaults)
       for ( v in vars[ii] ){ 
-        opt_val <- .al[[v]](L[[v]])
-        L[[v]] <- if(is.null(opt_val)) L[[v]] else opt_val
+        L[[v]] <- .al[[v]](L[[v]])
       }
       .op[vars] <<- L
       return(invisible(.op))
@@ -144,6 +143,7 @@ inlist <- function(...){
     if (!x %in% .list){
       stop(sprintf("Option value out of range. Allowed values are %s",paste(.list,collapse=",")),call.=FALSE)
     }
+    x
   }
 }
 
@@ -156,10 +156,11 @@ inrange <- function(min=-Inf,max=Inf){
       stop(sprintf("Option value out of range. Allowed values are in [%g, %g]",.range['min'], .range['max'])
            ,call.=FALSE)
     }
+    x
   }
 }
 
-nolimit <- function(...) invisible(NULL) 
+nolimit <- function(x) x 
 
 
 
