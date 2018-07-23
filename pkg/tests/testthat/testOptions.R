@@ -59,8 +59,22 @@ test_that("is_setting",{
 
 context("Range checks")
 
+test_that("initial range checks", {
+  expect_equal(options_manager(foo=1,.allowed=c(foo=inrange(0,1)))(),
+               list(foo=1),
+               info="Initial values that are valid succeed.")
+  expect_error(options_manager(foo=2,.allowed=c(foo=inrange(0,1)))(),
+               regex="Option value out of range. Allowed values are in [0, 1]",
+               fixed=TRUE,
+               info="Initial values that are invalid fail.")
+  set_to_1 <- function(x) 1
+  expect_equal(options_manager(foo=2,.allowed=c(foo=set_to_1))(),
+               list(foo=1),
+               info="Initial settings are modified, if needed.")
+})
+
 test_that("range checks",{
-  expect_error( options_manager(foo=1,.allowed=c(x=inrange(0,1)))  )
+  expect_error(options_manager(foo=1,.allowed=c(x=inrange(0,1)))  )
   expect_error(options_manager(x=1,.allowed=list(x=inrange(2,3))))
   opt <- options_manager(foo=1,bar=0
     , .allowed=list(
