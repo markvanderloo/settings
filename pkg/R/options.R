@@ -114,7 +114,10 @@ options_manager <- function(..., .list, .allowed){
       }
       # check if values are allowed (only for occurring options).
       ii <- vars %in% names(.defaults)
-      for ( v in vars[ii] ) L[[v]] <- .al[[v]](L[[v]])
+      for ( v in vars[ii] ) {
+        # to preserve NULL as a provided option, it must be put into a list.
+        L[v] <- list(.al[[v]](L[[v]]))
+      }
       
       .op[vars] <<- L
       return(invisible(.op))
@@ -122,6 +125,10 @@ options_manager <- function(..., .list, .allowed){
     # get options
     if (is.null(vars)){
       vars <- unlist(L)
+      missing_vars <- !(vars %in% names(.op))
+      if (any(missing_vars)) {
+        stop("Cannot find option name(s): ", paste(vars[missing_vars], collapse=", "))
+      }
       return( if (length(vars)==1) .op[[vars]] else .op[vars] )
     }      
     stop("Illegal arguments")

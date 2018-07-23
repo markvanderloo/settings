@@ -1,5 +1,6 @@
 version 0.2.5
 - options_manager gained .list argument
+- extended support for NULL option values
 
 version 0.2.4
 - support for limiting option values
