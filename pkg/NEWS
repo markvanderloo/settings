@@ -1,6 +1,8 @@
-version 0.2.5
+version 0.2.6
 - options_manager gained .list argument
 - extended support for NULL option values
+- Added 'rmarkdown' to Suggests, by CRAN request
+- Switched to 'tinytest' test framework
 
 version 0.2.4
 - support for limiting option values

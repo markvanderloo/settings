@@ -1,7 +1,7 @@
 Package: settings
 Type: Package
 Title: Software Option Settings Manager for R
-Version: 0.2.5
+Version: 0.2.6
 Author: Mark van der Loo
 Maintainer: Mark van der Loo <mark.vanderloo@gmail.com>
 Description: Provides option settings management that goes
@@ -19,11 +19,10 @@ URL: https://github.com/markvanderloo/settings
 BugReports: https://github.com/markvanderloo/settings/issues
 License: GPL-3
 VignetteBuilder: knitr
-Imports:
+Imports: 
     grDevices,
     graphics
-Suggests:
-    testthat,
+Suggests: 
     knitr,
-    rmarkdown
-RoxygenNote: 6.0.1
+    rmarkdown, tinytest
+RoxygenNote: 7.1.1
