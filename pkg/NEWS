@@ -1,4 +1,4 @@
-version 0.2.6
+version 0.2.7
 - options_manager gained .list argument
 - extended support for NULL option values
 - Added 'rmarkdown' to Suggests, by CRAN request
