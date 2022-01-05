@@ -23,6 +23,6 @@ Imports:
     grDevices,
     graphics
 Suggests: 
-    knitr,
+    knitr, markdown,
     rmarkdown, tinytest
 RoxygenNote: 7.1.1
