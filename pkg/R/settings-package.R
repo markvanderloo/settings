@@ -19,6 +19,6 @@
 #'        
 #' @docType package
 #' @name settings
-#' @aliases package-settings settings
+#' @aliases settings-package
 #' @import graphics grDevices
 NULL

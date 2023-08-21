@@ -1,3 +1,6 @@
+version 0.2.8
+- Fixed Rd bug (Thanks to Kurt Hornik for pointing out the changes)
+
 version 0.2.7
 - options_manager gained .list argument
 - extended support for NULL option values
