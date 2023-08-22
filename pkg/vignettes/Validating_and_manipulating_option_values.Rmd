@@ -34,12 +34,13 @@ value is valid, the lower-case variant will be stored, otherwise an informative 
 To do this, first write a function that performs these checks. Make sure that the function
 returns the value that needs to be stored.
 ```{r}
-foo_check <- function(x){
+foo_check <- function(x, .option=NULL){
   allowed <- c("boo","bar","baz")
   # cast to lowercase
   x <- base::tolower(x)
   if ( !x %in% allowed ){
-    stop("Option foo must be in 'boo', 'bar', or 'baz'", call. = FALSE)
+    optname <- get_option_name(.option)
+    stop(sprintf("%s must be in 'boo', 'bar', or 'baz'", optname), call. = FALSE)
   } else {
     x
   }
@@ -87,10 +88,11 @@ function are the allowed values.
 ```{r}
 make_checker <- function(allowed){
   .allowed <- allowed
-  function(x){
+  function(x, .option = NULL){
     x <- tolower(x)
     if (!x %in% .allowed){
-      stop(sprintf("Allowed values are %s",paste0(.allowed, collapse=", ")), call.=FALSE)
+      optname <- get_option_name(.option)
+      stop(sprintf("Allowed values for %s are %s",optname,paste0(.allowed, collapse=", ")), call.=FALSE)
     } else {
       x
     }

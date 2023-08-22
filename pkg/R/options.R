@@ -5,15 +5,15 @@
 #'
 #'
 #' @section Details:
-#' 
+#'
 #' The function \code{options_manager} creates an option management function. The returned
 #' function can be uset to set, get, or reset options. The only restriction of the package is
 #' that the following words cannot be used as names for options:
-#' 
+#'
 #' \code{.__reset} \code{.__defaults}
 #'
 #' For more details and extensive examples see the vignette by copy-pasting this command:
-#' 
+#'
 #'    \code{vignette("settings", package = "settings")}
 #'
 #' @section Checking options:
@@ -25,50 +25,50 @@
 #'
 #'
 #' @param ... Comma separated \code{[name]=[value]} pairs. These will be the names and default values for your options manager.
-#' @param .list optional List of \code{[name]=[value]} pairs. Will be concatenated with 
+#' @param .list optional List of \code{[name]=[value]} pairs. Will be concatenated with
 #'   arguments in \code{...}.
-#' @param .allowed list of named functions that check an option (see 'checking options') 
+#' @param .allowed list of named functions that check an option (see 'checking options')
 #'
 #' @return A \code{function} that can be used as a custom options manager. It takes as arguments
-#' a comma separated list of option names (\code{character}) to retrieve options or 
+#' a comma separated list of option names (\code{character}) to retrieve options or
 #' \code{[name]=[value]} pairs to set options.
-#'   
+#'
 #' @examples
 #' # create an options register
 #' my_options <- options_manager(foo=1,bar=2,baz='bob')
-#' 
+#'
 #' ### Retrieving options
 #' my_options() # retrieve the full options list.
 #' my_options('baz')
 #' my_options('foo')
-#' 
+#'
 #' # When multiple options are retrieved, the result is a list
 #' my_options('foo','baz')
-#' 
+#'
 #' ### Setting global options
 #' my_options(foo=3,baz='pete')
 #' my_options()
 #' ### Reset options to default.
 #' reset(my_options)
 #' my_options()
-#' 
+#'
 #' ### Limit the possible values for an option.
 #' my_options <- options_manager( fu="bar",.allowed = list(fu=inlist("foo","bar")) )
 #'
-#' @seealso 
-#' 
+#' @seealso
+#'
 #' Reset to default values: \code{\link{reset}}.
-#' 
+#'
 #' Retrieve default values: \code{\link{defaults}}
-#' 
+#'
 #' Create a local, possibly altered copy: \code{\link{clone_and_merge}}
-#' 
+#'
 #' @export
 options_manager <- function(..., .list, .allowed){
   stop_if_reserved(...)
-  if (missing(.list)){ 
+  if (missing(.list)){
     .list <- NULL
-  } else { 
+  } else {
    stopifnot(is.list(.list))
   }
   .defaults <- c(list(...),.list)
@@ -87,10 +87,10 @@ options_manager <- function(..., .list, .allowed){
   # (potentially modified) default.
   vars <- names(.defaults)
   for (v in vars) {
-    .defaults[v] <- list(.al[[v]](.defaults[[v]]))
+    .defaults[v] <- list(.al[[v]](.defaults[[v]], .option=v))
   }
   .op <- .defaults
-  
+
   # create the options manager function
   function(..., .__defaults=FALSE, .__reset=FALSE){
     L <- list(...)
@@ -107,7 +107,7 @@ options_manager <- function(..., .list, .allowed){
       if (!all(vars %in% names(.defaults))){
         ii <- vars %in% names(.defaults)
         warning(sprintf("Ignoring options not defined in manager: %s"
-            , paste(vars[!ii], collapse=", ") 
+            , paste(vars[!ii], collapse=", ")
         ))
         vars <- vars[ii]
         L <- L[ii]
@@ -116,9 +116,9 @@ options_manager <- function(..., .list, .allowed){
       ii <- vars %in% names(.defaults)
       for ( v in vars[ii] ) {
         # to preserve NULL as a provided option, it must be put into a list.
-        L[v] <- list(.al[[v]](L[[v]]))
+        L[v] <- list(.al[[v]](L[[v]], .option=v))
       }
-      
+
       .op[vars] <<- L
       return(invisible(.op))
     }
@@ -130,7 +130,7 @@ options_manager <- function(..., .list, .allowed){
         stop("Cannot find option name(s): ", paste(vars[missing_vars], collapse=", "))
       }
       return( if (length(vars)==1) .op[[vars]] else .op[vars] )
-    }      
+    }
     stop("Illegal arguments")
   }
 }
@@ -148,9 +148,10 @@ options_manager <- function(..., .list, .allowed){
 #' @export
 inlist <- function(...){
   .list <- unlist(list(...))
-  function(x){
+  function(x, .option=NULL){
+    optname <- get_option_name(.option)
     if (!x %in% .list){
-      stop(sprintf("Option value out of range. Allowed values are %s",paste(.list,collapse=",")),call.=FALSE)
+      stop(sprintf("%s value out of range. Allowed values are %s, found %s", optname, paste(.list,collapse=","), x), call.=FALSE)
     }
     x
   }
@@ -160,18 +161,36 @@ inlist <- function(...){
 #' @export
 inrange <- function(min=-Inf,max=Inf){
   .range <- c(min=min, max=max)
-  function(x){
+  function(x, .option=NULL){
     if( !is.numeric(x) || ( x > .range['max'] | x < .range['min']) ){
-      stop(sprintf("Option value out of range. Allowed values are in [%g, %g]",.range['min'], .range['max'])
+      optname <- get_option_name(.option)
+      stop(sprintf("%s value out of range. Allowed values are in [%g, %g], found %g", optname, .range['min'], .range['max'], x)
            ,call.=FALSE)
     }
     x
   }
 }
 
-nolimit <- function(x) x 
+nolimit <- function(x, .option = NULL) x
 
 
+#' Generate the option name.
+#'
+#' If `NULL`, fallback to default value "option". Otherwise, "option '.option'".
+#'
+#' @param .option The name of the current option.
+#'
+#' @return The formatted option name.
+#' @examples
+#' get_option_name('Test')
+#' @export
+get_option_name <- function(.option) {
+  optname <- "option"
+  if ( !is.null(.option) ){
+    optname <- paste0("option '", .option, "'")
+  }
+  base::return(optname)
+}
 
 
 #' Create a local, altered copy of an options manager
@@ -182,34 +201,34 @@ nolimit <- function(x) x
 #' This function creates a copy of the options manager \code{options}, with the same defaults.
 #' However, the current settings may be altered by passing extra arguments. Its intended use
 #' is to allow for easy merging of local options with global settings in a function call.
-#' 
+#'
 #' Some more examples can be found in the vignette: \code{vignette('settings',package='options')}.
 #'
 #' @param options A function as returned by \code{\link{options_manager}} or \code{clone_and_merge}.
-#' @param ... Options to be merged, in the form of \code{[name]=[value]} pairs. 
+#' @param ... Options to be merged, in the form of \code{[name]=[value]} pairs.
 #'
 #' @return A option manager like \code{options}, with possibly different settings.
 #'
 #' @seealso \code{\link{options_manager}}, \code{\link{reset}}, \code{\link{defaults}}
-#' 
-#' @examples 
+#'
+#' @examples
 #' # Create global option manager.
 #' opt <- options_manager(foo=1,bar='a')
-#' 
+#'
 #' # create an altered copy
 #' loc_opt <- clone_and_merge(opt, foo=2)
-#' 
+#'
 #' # this has no effect on the 'global' version
 #' opt()
 #' # but the local version is different
 #' loc_opt()
-#' 
+#'
 #' # we alter the global version and reset the local version
 #' opt(foo=3)
 #' reset(loc_opt)
 #' opt()
 #' loc_opt()
-#' 
+#'
 #' # create an options manager with some option values limited
 #' opt <- options_manager(prob=0.5,y='foo',z=1,
 #'   .allowed=list(
@@ -224,9 +243,9 @@ nolimit <- function(x) x
 #' # this gives an error
 #' opt(prob=2)
 #' }
-#' 
-#' 
-#' @export 
+#'
+#'
+#' @export
 clone_and_merge <- function(options,...){
   df <- options(.__defaults=TRUE)
   op <- options()
@@ -239,45 +258,45 @@ clone_and_merge <- function(options,...){
 #' Reset options to default values
 #'
 #' @param options An option manager, as returned by \code{\link{options_manager}} or \code{\link{clone_and_merge}}
-#' 
+#'
 #' @return The list of reset options, invisibly.
-#' 
+#'
 #' @seealso \code{\link{defaults}}
-#' @export 
+#' @export
 reset <- function(options) options(.__reset=TRUE)
 
 #' Request default option values
-#' 
+#'
 #' @param options An option manager, as returned by \code{\link{options_manager}} or \code{\link{clone_and_merge}}
-#' 
+#'
 #' @return A \code{list}.
-#' 
+#'
 #' @seealso \code{\link{reset}}
 #' @export
 defaults <- function(options) options(.__defaults=TRUE)
 
 
 #' Check for reserved option names.
-#' 
+#'
 #' Utility function checking for reserved names.
-#' 
+#'
 #' @section Details:
 #' This is a utility function that checks if the keys of the key-value pairs
 #' \code{...} contain reserved words. The reserved words are
-#' 
+#'
 #' \code{.__defaults}, \code{.__reserved}.
-#' 
+#'
 #' If reserved words are encountered in the input an error thrown.
-#' The package vignette has examples of its use: 
-#' 
+#' The package vignette has examples of its use:
+#'
 #'    \code{vignette('settings',package='options')}
-#' 
+#'
 #' @param ... Comma-separated \code{[key]=[value]} pairs
-#' 
+#'
 #' @return \code{logical}, indicating if any of the keys was reserved (invisibly).
-#' 
+#'
 #' @seealso \code{\link{is_setting}}
-#' 
+#'
 #' @export
 stop_if_reserved <- function(...){
   res <- c(".__defaults",".__reserved")
@@ -290,22 +309,22 @@ stop_if_reserved <- function(...){
 }
 
 #' Find out if we're setting or getting
-#' 
+#'
 #' Utility function checking if we're setting or getting.
-#' 
+#'
 #' @param ... \code{[key]=[value]} pairs of options
 #' @return \code{logical}, \code{TRUE} if \code{...} represents set-options, \code{FALSE} if
 #'  \code{...} represents get-options. An error is thrown if it cannot be determined.
-#' 
-#' 
+#'
+#'
 #' @seealso \code{\link{stop_if_reserved}}
-#' 
-#' @export 
+#'
+#' @export
 is_setting <- function(...){
   L <- list(...)
   nm <- names(L)
   set <- !is.null(nm) && !any(nm=="")
-  get <- length(L)  == 0 | (length(L) > 0 & is.null(nm)) 
+  get <- length(L)  == 0 | (length(L) > 0 & is.null(nm))
   stopifnot(set | get)
   set
 }
